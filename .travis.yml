@@ -1,0 +1,24 @@
+language: ruby
+sudo: false
+cache: bundler
+
+rvm:
+  - 2.0.0
+  - 2.1
+  - 2.2
+  - ruby-head
+  - jruby-head
+  - rbx-2
+
+matrix:
+  allow_failures:
+    - rvm: rbx-3
+    - rvm: ruby-head
+
+# script: bundle exec rspec spec
+env:
+  global:
+    - JAVA_OPTS="-server -Djruby.cext.enabled=false -Djruby.compile.invokedynamic=false"
+
+notifications:
+  irc: "irc.freenode.net#rubber"
