@@ -131,7 +131,7 @@ class InstanceTest < Minitest::Test
   
       assert ! RoleItem.new('a').eql?(RoleItem.new('b'))
       assert RoleItem.new('a') != RoleItem.new('b')
-      assert_not_equal RoleItem.new('a').hash, RoleItem.new('b').hash
+      refute_equal RoleItem.new('a').hash, RoleItem.new('b').hash
   
       assert RoleItem.new('a', {'a' => 'b', 1 => true}).eql?(RoleItem.new('a', {'a' => 'b', 1 => true}))
       assert RoleItem.new('a', {'a' => 'b', 1 => true}) == RoleItem.new('a', {'a' => 'b', 1 => true})
@@ -189,87 +189,6 @@ class InstanceTest < Minitest::Test
                  RoleItem.new('common') => [RoleItem.new('c')]}
         roles = [RoleItem.new('a'), RoleItem.new('b'), RoleItem.new('c')]
         assert_equal roles, RoleItem.expand_role_dependencies(RoleItem.new('a'), deps).sort
-      end
-      
-    end
-    
-    context "cloud storage" do
-      require 'rubber/cloud/aws'
-      
-      setup do
-        env = {'access_key' => "XXX", 'secret_access_key' => "YYY", 'region' => "us-east-1"}
-        env = Rubber::Configuration::Environment::BoundEnv.new(env, nil, nil, nil)
-        # @cloud = Rubber::Cloud::Aws::Classic.new(env, nil)
-        # @cloud.storage_provider.put_bucket('bucket')
-        # Rubber.stubs(:cloud).returns(@cloud)
-      end
-      
-      should "fail for invalid instance_storage protocol" do
-        Instance.new('file:baz')
-
-        @cloud.storage('bucket').store('key', '')
-        Instance.new('storage:bucket/key')
-        
-        Instance.any_instance.stubs(:load_from_table)
-        Instance.new('table:bar')
-        
-        assert_raises { Instance.new('foo:bar') }
-      end
-      
-      should "load and save from file when file given" do
-        location = "file:#{Tempfile.new('instancestorage').path}"
-        Instance.any_instance.expects(:load_from_file)
-        Instance.any_instance.expects(:save_to_file)
-        Instance.new(location).save
-      end
-
-      should "create new instance in filesystem when instance file doesn't exist" do
-        tempfile = Tempfile.new('instancestorage')
-        location = "file:#{tempfile.path}"
-
-        tempfile.close
-        tempfile.unlink
-
-        Instance.any_instance.expects(:load_from_file).never
-        Instance.any_instance.expects(:save_to_file)
-        Instance.new(location).save
-      end
-      
-      should "load and save from storage when storage given" do
-        @cloud.storage('bucket').store('key', '')
-        Instance.any_instance.expects(:load_from_file)
-        Instance.any_instance.expects(:save_to_file)
-        Instance.new('storage:bucket/key').save        
-      end
-
-      should "create a new instance in cloud storage when the instance file doesn't exist" do
-        Instance.any_instance.expects(:load_from_file).never
-        Instance.any_instance.expects(:save_to_file)
-        Instance.new('storage:bucket/key').save
-      end
-
-      should "load and save from table when table given" do
-        Instance.any_instance.expects(:load_from_table)
-        Instance.any_instance.expects(:save_to_table)
-        Instance.new('table:foobar').save        
-      end
-      
-      should "backup on save when desired" do
-        location_file = Tempfile.new('instancestorage').path
-        location = "file:#{location_file}"
-        backup_file = Tempfile.new('instancestoragebackup').path
-        backup = "file:#{backup_file}"
-        
-        
-        instance = Instance.new(location, :backup => backup) 
-        instance.add(@i1 = InstanceItem.new('host1', 'domain.com', [RoleItem.new('role1')], '', 'm1.small', 'ami-7000f019'))
-        instance.save
-        
-        location_data = File.read(location_file)
-        backup_data = File.read(backup_file)
-        assert location_data.size > 0
-        assert backup_data.size > 0
-        assert_equal location_data, backup_data
       end
       
     end

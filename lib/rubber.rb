@@ -103,13 +103,6 @@ require 'rubber/environment'
 require 'rubber/generator'
 require 'rubber/instance'
 require 'rubber/util'
-require 'rubber/cloud'
-require 'rubber/dns'
-
-if defined?(::Vagrant)
-  require 'rubber/vagrant/plugin'
-end
-
 
 if defined?(Rails::Railtie)
   module Rubber
