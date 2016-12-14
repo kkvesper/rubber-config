@@ -1,35 +1,5 @@
-
-
 module Rubber
   module Util
-
-    def symbolize_keys(map)
-      map.inject({}) do |options, (key, value)|
-        options[key.to_sym || key] = value
-        options
-      end
-    end
-    
-    def stringify_keys(map)
-      map.inject({}) do |options, (key, value)|
-        options[key.to_s || key] = value
-        options
-      end
-    end
-    
-    def stringify(val)
-      case val
-      when String
-        val
-      when Hash
-        val.inject({}) {|h, a| h[stringify(a[0])] = stringify(a[1]); h}
-      when Enumerable
-        val.collect {|v| stringify(v)}
-      else
-        val.to_s
-      end
-      
-    end
 
     def parse_aliases(instance_aliases)
       aliases = []
@@ -93,30 +63,6 @@ module Rubber
           line
         end
       end.join()
-    end
-
-    # execute the given block, retrying only when one of the given exceptions is raised
-    def retry_on_failure(*exception_list)
-      opts = exception_list.last.is_a?(Hash) ? exception_list.pop : {}
-      opts = {:retry_count => 3}.merge(opts)
-      retry_count = opts[:retry_count]
-      begin
-        yield
-      rescue *exception_list => e
-        if retry_count > 0
-          retry_count -= 1
-          Rubber.logger.info "Exception, trying again #{retry_count} more times"
-          sleep opts[:retry_sleep].to_i if opts[:retry_sleep] 
-          retry
-        else
-          Rubber.logger.error "Too many exceptions...re-raising"
-          raise
-        end
-      end
-    end
-
-    def camelcase(str)
-      str.split('_').map{ |part| part.capitalize }.join
     end
 
     def is_instance_id?(str)

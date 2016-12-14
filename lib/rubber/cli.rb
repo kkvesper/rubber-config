@@ -23,7 +23,5 @@ module Rubber
       puts Rubber.version
       exit 0
     end
-    
   end
-  
 end

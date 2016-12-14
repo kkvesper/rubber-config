@@ -8,10 +8,3 @@ module Rubber
     end
   end
 end
-
-if defined?(Spring)
-  Spring.after_fork do
-    Rubber.reset
-    Rubber::initialize(Rails.root, Rails.env)
-  end
-end
