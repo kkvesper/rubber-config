@@ -35,6 +35,7 @@ module Rubber
         next unless File.exists?(file)
         return File.open(file, 'r').read.split("\n").map(&:strip).reject(&:blank?)
       end
+      []
     end
 
     def self.rubber_instances
