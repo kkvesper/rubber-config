@@ -26,8 +26,15 @@ module Rubber
       raise "This convenience method needs Rubber.env to be set" unless Rubber.env
       cfg = Rubber::Configuration.get_configuration(Rubber.env)
       host = cfg.environment.current_host
-      roles = cfg.instance[host] ? cfg.instance[host].role_names : nil
+      # roles = cfg.instance[host] ? cfg.instance[host].role_names : nil
       cfg.environment.bind(roles, host)
+    end
+
+    def self.roles
+      ['/etc/server_roles', "#{Rubber.root}/server_roles"].each do |file|
+        next unless File.exists?(file)
+        return File.open(file, 'r').read.split("\n").map(&:strip).reject(&:blank?)
+      end
     end
 
     def self.rubber_instances
@@ -55,7 +62,7 @@ module Rubber
         instance_storage ||= "file:#{@root}/instance-#{@env}.yml"
         @instance = Instance.new(instance_storage, :backup => instance_storage_backup)
       end
-      
+
       def environment
         @environment
       end
