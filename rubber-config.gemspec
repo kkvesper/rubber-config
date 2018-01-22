@@ -5,7 +5,7 @@ require 'rubber/version'
 
 Gem::Specification.new do |s|
 
-  s.name = "rubber"
+  s.name = "rubber-config"
   s.version     = Rubber::VERSION.dup
   s.platform    = Gem::Platform::RUBY
   s.required_ruby_version = '>= 1.9.3'
